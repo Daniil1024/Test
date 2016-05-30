@@ -11,11 +11,12 @@ Sprite load;//основной спрайт в окне
 int level;
 int alphabet(char ch, char alphabet[])//меняет char на номер клавиши в Keyboard
         {
+ 
 
             //массив всех английских букв
-            for (int ii = 0;ii<sizeof(alphabet)/sizeof(alphabet[0]);ii++)//цикл ищет порядковый номер буквы в алфавите
+            for (int ii = 0;ii<25;ii++)//цикл ищет порядковый номер буквы в алфавите
             {
-                if (ch == alphabet[ii]){return ii;}
+                if (char(ch) == alphabet[ii]){return ii;}
             }
  
  
@@ -36,7 +37,7 @@ String random_string(int lvl, char *m) //метод для генерации случайной строки
 	srand(time(NULL));
 	for (int j = 0,s; j < 25; j++) 
 	{ 
-		s = rand() % (lvl+2); //выбор случайной буквы в зависимости от уровня
+		s = rand() % (lvl+1); //выбор случайной буквы в зависимости от уровня
 		char c = m[s];
 		if(c == ' ')//если сгенерировался пробел продолжить менять эту же букву
 		{
@@ -51,7 +52,7 @@ String random_string(int lvl, char *m) //метод для генерации случайной строки
 
 int menu(int key[] ) //меню и выбор начала новой игры или загрузки уровня
 { 
-	int number = 1,cheat;
+	int number = 1;//переменная для хранения результата ввода пользователя(number)
 	Text text("", font, 20);//инициализация рисуемого текста с нужным шрифтом и размером
 	text.setColor(Color :: White);
 	text.setPosition(110 , 200);
@@ -292,7 +293,7 @@ int main(){
 	int key[] = { 1320, 5051, 3299, 9488, 2620, 4744, 6164, 2405, 8821, 2275, 1030, 9325, 9094, 2243, 9572, 5847, 5741, 1509, 6272, 5109, 4976, 6393, 5477, 2904, 5817 };
 	
 	float time = 10;//переменная отвечающая за оставшееся время
-	int right = 0, nright = 0;
+	int right = 0, nright = 0;//переменные отвечающие за кол - во правильно и неправильно введённных букв
 	char mass[28];//переменные - кол-во правильно введённых букв, неправильно и массив с алфавитом
 	level = menu(key);//выбор уровня
     while (window.isOpen()){//пока окно открыто
@@ -417,26 +418,26 @@ int main(){
 	                {
 				       if(event.key.code == Keyboard :: Key(alphabet(c, mass)))//если правильная
 			           {
-			               isRight[j] = 1;
-			               j++;
-					       right++; 
-					       while(true)
+			               isRight[j] = 1;//в массиве числу с индексом, соответствующим порядковому номеру набираемой буквы, присваивается 1
+			               j++;//переходит к следующей букве
+					       right++;//добавляет 1 к правильным вводам
+					       while(true)//ждет отжатия клавиши
 					       {
 					           if(!Keyboard :: isKeyPressed(Keyboard :: Key(alphabet(c, mass))))
 						       {
-					               time += 0.1;
+					               time += 0.1;//прибавляется время
 					               break;
 					           }
 					       }				
 					       break;
 					   }
-					   else 
+					   else //если неправильная
 				       { 
-				           isRight[j] = 2;
-				           time -= 0.1;
-					       j++;
-					       printf("\a");
-					       nright++; 
+				           isRight[j] = 2;//в массиве числу с индексом, соответствующим порядковому номеру набираемой буквы, присваивается 2
+				           time -= 0.1;//вычитается время
+					       j++;//переходит к следующей букве
+					       printf("\a");//издает звук ошибки
+					       nright++; //добавляет 1 к неправильным вводам
 				       }
 	               }
 	               if (event.type == sf::Event::Closed)
@@ -445,10 +446,10 @@ int main(){
                        exit(0);
 	               }
 	          }
-              if(time < 0){j = 24; break;}
-			  if (nright == 5){ j=24;break; }
+              if(time < 0){j = 24; break;}//если время закончилось, выйти из цикла
+			  if (nright >= 5){ j=24;break; }//если слишком много ошибок, выйти из цикла
 	      }
-		  if (nright == 5) 
+		  if (nright >= 5)//если слишком много ошибок
 		  { 
 		      Texture texture;
 			  texture.loadFromFile("flag.png");
@@ -485,7 +486,7 @@ int main(){
 				  window.draw(chartext);
 			  }
 		      ostringstream strtime;
-		 	  strtime << int(time*10)/10.0;
+		 	  strtime << int(time*10)/10.0;//округление времени до десятых
 		 	  Text ttime("Оставшееся время "+strtime.str(),font,20);
 			  ttime.setPosition(50, 450);
 			  window.draw(load);
@@ -496,17 +497,17 @@ int main(){
               window.display();			
 			  while (true)
 			  {
-	              if(Keyboard :: isKeyPressed(Keyboard :: Escape))
+	              if(Keyboard :: isKeyPressed(Keyboard :: Escape))//если нажат Ecs
 			 	  {
 				      while(true)
 					  {
 					      if(!Keyboard :: isKeyPressed(Keyboard :: Escape))
-					          main();
+					          main();//вернуться к началу
 				      }
 				  }
 			  } 
 		 }
-			if (time < 0 && right < 20) { 
+			if (time < 0 && right < 20) { //если время закончилось, но правильно введённых меньше 20
 
 			 Texture texture;
 			 texture.loadFromFile("flag.png");
@@ -561,17 +562,16 @@ window.display();
 						  }
 						} 
 			} 
-			 if(level != 25){
-				if (right>20) { 
-					level++;
+			 if(level != 25){//если уровень не 25
+				if (right>=20) { //если правильных больше или равно 20
+					level++;//перейти на следующий уровень
 				}
-				}else
+				}else//иначе(т. е. если уровень 25)
 				{
-
 				 Text text("", font, 30);
 				 text.setColor(Color :: Black);
-				 text.setPosition(0,0);
-				 text.setString("Вы молодец!!! Теперь вы сможете быстро печатать!\n Поздравляем!!!\n Нажмите Esc для выхода из игры");
+				 text.setPosition(200,250);
+				 text.setString("Вы молодец!!! Теперь вы сможете\n быстро печатать!\n Поздравляем!!!\n Нажмите Esc для выхода из игры");
 				 t.loadFromFile("molodetz.jpg");
 				 load.setTexture(t);
 				 load.setPosition(0,0);
@@ -579,10 +579,7 @@ window.display();
 				 window.clear();
 				 ostringstream strtime;
 				 strtime << int(time*10)/10.0;
-				 Text ttime("Оставшееся время "+strtime.str(),font,20);
-				 ttime.setPosition(50, 450);
 				 window.draw(load);
-				 window.draw(ttime);
 				 window.draw(text);
 				 window.display();
 				 while(true)
